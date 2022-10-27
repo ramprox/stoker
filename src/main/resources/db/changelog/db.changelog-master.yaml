@@ -1,0 +1,24 @@
+databaseChangeLog:
+  - preConditions:
+      - dbms:
+          type: postgresql
+      - runningAs:
+          username: stoker
+
+  - changeSet:
+      id: init
+      author: stoker
+      changes:
+        - tagDatabase:
+            tag: db_init
+
+  - include:
+      file: v-1.0/root.changelog.yaml
+      relativeToChangelogFile: true
+
+  - changeSet:
+      id: finish-v-1.0
+      author: stoker
+      changes:
+        - tagDatabase:
+            tag: v-1.0

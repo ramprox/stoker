@@ -1,0 +1,15 @@
+version: '3'
+services:
+  db:
+    image: postgres
+    environment:
+      POSTGRES_USER: spring
+      POSTGRES_PASSWORD: spring
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./scripts/db:/docker-entrypoint-initdb.d
+      - postgres:/var/lib/postgresql/data
+
+volumes:
+  postgres:

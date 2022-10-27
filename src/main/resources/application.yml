@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/stoker_db
+    driver-class-name: org.postgresql.Driver
+    username: stoker
+    password: stoker
+  jpa:
+    hibernate:
+      ddl-auto: validate
