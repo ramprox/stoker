@@ -1,0 +1,53 @@
+databaseChangeLog:
+
+  - changeSet:
+      id: favorites
+      author: stoker
+      changes:
+        - createTable:
+            tableName: favorites
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: favoritesPK
+                  name: advertisement_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: favoritesPK
+                  name: user_id
+                  type: BIGINT
+
+  - changeSet:
+      id: advertisement_id
+      author: stoker
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: advertisement_id
+            baseTableName: favorites
+            constraintName: fk_favorites_ads_id_adss_id
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: advertisements
+            validate: true
+            onDelete: CASCADE
+
+  - changeSet:
+      id: fk_favorites_user_id_users_id
+      author: stoker
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: favorites
+            constraintName: fk_favorites_user_id_users_id
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: users
+            validate: true
+            onDelete: CASCADE

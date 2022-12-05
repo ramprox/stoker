@@ -1,0 +1,36 @@
+testcontainers:
+  host: localhost
+  port: 5432
+  dbName: stoker_test_db
+  imageName: postgres:alpine3.17
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/stoker_test_db
+    driver-class-name: org.postgresql.Driver
+    username: stoker_test
+    password: stoker_test
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        show_sql: false
+  liquibase:
+    enabled: false
+  main:
+    allow-bean-definition-overriding: true
+
+confirm:
+  checkTask:
+    initDelay: PT1H
+
+logging:
+  level:
+    jdbc:
+      sqltiming: OFF
+      resultsettable: DEBUG
+      connection: INFO
+      sqlonly: INFO
+      audit: OFF
+      resultset: OFF

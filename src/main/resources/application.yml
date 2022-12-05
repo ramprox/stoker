@@ -1,9 +1,51 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/stoker_db
+    url: jdbc:postgresql://${DB:localhost}:5432/stoker_db
     driver-class-name: org.postgresql.Driver
     username: stoker
     password: stoker
   jpa:
     hibernate:
       ddl-auto: validate
+  task:
+    scheduling:
+      pool:
+        size: 2
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ramil19882307
+    password: wroeihbjacbeeruy
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  messages:
+    basename:
+      messages/email/email,
+      messages/exceptions/exceptions,
+      messages/validations/validations,
+      messages/messages/messages
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+
+mail:
+  sender: Stoker <ramil19882307@gmail.com>
+  emailTemplateFile: mailTemplate.html
+
+security:
+  jwtKey: stoker
+
+picture:
+  storage:
+    path: ./pictures
+
+confirm:
+  linkTemplate: http://localhost:8080/api/v1/auth/confirm?userId=%d&code=%s
+  waitDuration: P3D
+  checkTask:
+    initDelay: 0
+    fixedRate: PT1H

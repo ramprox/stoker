@@ -1,0 +1,52 @@
+databaseChangeLog:
+
+  - changeSet:
+      id: attachment-seq
+      author: stoker
+      changes:
+        - createSequence:
+            incrementBy: 1
+            sequenceName: att_seq
+
+  - changeSet:
+      id: attachments
+      author: stoker
+      changes:
+        - createTable:
+            tableName: attachments
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: attachmentsPK
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: filename
+                  type: VARCHAR(4096)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: content_type
+                  type: VARCHAR(20)
+              - column:
+                  name: product_id
+                  type: BIGINT
+
+  - changeSet:
+      id: fk_att_product_id
+      author: stoker
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: product_id
+            baseTableName: attachments
+            constraintName: fk_att_product_id
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: advertisement_id
+            referencedTableName: products
+            validate: true
+            onDelete: CASCADE

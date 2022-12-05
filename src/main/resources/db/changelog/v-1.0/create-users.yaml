@@ -1,0 +1,101 @@
+databaseChangeLog:
+
+  - changeSet:
+      id: users-seq
+      author: stoker
+      changes:
+        - createSequence:
+            incrementBy: 1
+            sequenceName: users_seq
+
+  - changeSet:
+      id: users
+      author: stoker
+      changes:
+        - createTable:
+            tableName: users
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: usersPK
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: login
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: password
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: role
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: email
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: phone
+                  type: VARCHAR(20)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: firstname
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: lastname
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: birthday
+                  type: date
+              - column:
+                  constraints:
+                    nullable: false
+                  name: is_confirmed
+                  type: boolean
+              - column:
+                  constraints:
+                    nullable: false
+                  name: created_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+
+  - changeSet:
+      id: login-unique-index
+      author: stoker
+      changes:
+        - addUniqueConstraint:
+            columnNames: login
+            constraintName: login_uq
+            tableName: users
+
+  - changeSet:
+      id: email-unique-index
+      author: stoker
+      changes:
+        - addUniqueConstraint:
+            columnNames: email
+            constraintName: email_uq
+            tableName: users
+
+  - changeSet:
+      id: phone-unique-index
+      author: stoker
+      changes:
+        - addUniqueConstraint:
+            columnNames: phone
+            constraintName: phone_uq
+            tableName: users

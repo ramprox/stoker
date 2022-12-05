@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+<div style="font-size: 1.5rem; font-family: sans-serif;">
+    <h3 th:text="#{email.title}"></h3>
+    <p th:text="#{email.command.text}"></p>
+    <a th:href="${link}" th:text="#{email.btn.name}"
+       style="padding:10px;
+            width:300px;
+            display:block;
+            text-decoration:none;
+            border-radius:5px;
+            text-align:center;
+            color:white;
+            background-color: #2848e7;
+            font-size: 1.5rem;"></a>
+</div>
+</body>
+</html>

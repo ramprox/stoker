@@ -1,6 +1,5 @@
 package ru.stoker.database.entity;
 
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -8,16 +7,13 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import java.util.Date;
+import java.time.LocalDate;
 
-import static javax.persistence.CascadeType.MERGE;
-import static javax.persistence.CascadeType.PERSIST;
+import static javax.persistence.CascadeType.*;
 
 @Setter
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @Entity
 @Table(name = Advertisement.TABLE_NAME)
 public class Advertisement {
@@ -25,31 +21,26 @@ public class Advertisement {
     public static final String TABLE_NAME = "advertisements";
     public static final String SEQUENCE_NAME = "ads_seq";
 
-    @Setter(AccessLevel.NONE)
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_gen")
-    @SequenceGenerator(name = "seq_gen", sequenceName = SEQUENCE_NAME, allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "advt_seq_gen")
+    @SequenceGenerator(name = "advt_seq_gen", sequenceName = SEQUENCE_NAME, allocationSize = 1)
     private Long id;
 
-    @NotBlank(message = "Имя объявления не должно быть пустым")
     @Column(name = "name", nullable = false)
     private String name;
 
-    @NotNull(message = "Дата размещения объвления не должна быть пустой")
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "posted_at", nullable = false)
-    private Date postedAt;
+    private LocalDate postedAt;
 
-    @NotNull(message = "Автор объвления не должен быть пустым")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "fk_ads_user_id"), nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
-    @OneToOne(mappedBy = "advertisement", cascade = { PERSIST, MERGE })
+    @OneToOne(mappedBy = "advertisement", cascade = { PERSIST, MERGE, REMOVE })
     private Product product;
 
-    public Advertisement(String name, Date postedAt, User user) {
+    public Advertisement(String name, LocalDate postedAt, User user) {
         this.name = name;
         this.postedAt = postedAt;
         this.user = user;
@@ -58,6 +49,18 @@ public class Advertisement {
     public void setProduct(Product product) {
         this.product = product;
         product.setAdvertisement(this);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Advertisement other)) return false;
+        return id != null && id.equals(other.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
     }
 
 }

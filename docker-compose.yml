@@ -1,15 +1,27 @@
 version: '3'
 services:
   db:
-    image: postgres
+    image: postgres:alpine3.17
     environment:
-      POSTGRES_USER: spring
-      POSTGRES_PASSWORD: spring
+      POSTGRES_USER: stoker
+      POSTGRES_PASSWORD: stoker
+      POSTGRES_DB: stoker_db
     ports:
       - "5432:5432"
     volumes:
-      - ./scripts/db:/docker-entrypoint-initdb.d
       - postgres:/var/lib/postgresql/data
+
+  backend:
+    image: backend:1.0
+    environment:
+      DB: db
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    volumes:
+      - backend-data:/app/pictures
 
 volumes:
   postgres:
+  backend-data:

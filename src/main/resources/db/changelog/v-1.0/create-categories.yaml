@@ -1,0 +1,47 @@
+databaseChangeLog:
+
+  - changeSet:
+      id: categories-seq
+      author: stoker
+      changes:
+        - createSequence:
+            incrementBy: 1
+            sequenceName: categories_seq
+
+  - changeSet:
+      id: categories
+      author: stoker
+      changes:
+        - createTable:
+            tableName: categories
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: categoriesPK
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: name
+                  type: VARCHAR(255)
+              - column:
+                  name: category_id
+                  type: BIGINT
+
+  - changeSet:
+      id: fk_cat_category_id_cat_id
+      author: stoker
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: category_id
+            baseTableName: categories
+            constraintName: fk_cat_category_id_cat_id
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: categories
+            validate: true
+            onDelete: CASCADE

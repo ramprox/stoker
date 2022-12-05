@@ -1,0 +1,62 @@
+databaseChangeLog:
+
+  - changeSet:
+      id: products
+      author: stoker
+      changes:
+        - createTable:
+            tableName: products
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: productsPK
+                  name: advertisement_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: category_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: price
+                  type: numeric(19, 2)
+              - column:
+                  name: description
+                  type: VARCHAR(2048)
+              - column:
+                  name: properties
+                  type: JSONB
+
+  - changeSet:
+      id: fk-ads-id-prod-id
+      author: stoker
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: advertisement_id
+            baseTableName: products
+            constraintName: fk_ads_id_prod_id
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: advertisements
+            validate: true
+            onDelete: CASCADE
+
+  - changeSet:
+      id: fk_prod_cat_id_cat_id
+      author: stoker
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: category_id
+            baseTableName: products
+            constraintName: fk_prod_cat_id_cat_id
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: categories
+            validate: true
+            onDelete: CASCADE

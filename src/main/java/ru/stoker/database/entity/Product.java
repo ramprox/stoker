@@ -18,16 +18,13 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import static javax.persistence.CascadeType.*;
 
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @Entity
 @Table(name = "products")
 @TypeDefs({
@@ -35,11 +32,9 @@ import static javax.persistence.CascadeType.*;
 })
 public class Product {
 
-    @Setter(AccessLevel.NONE)
     @Id
     private Long id;
 
-    @NotNull(message = "Объявление не должно быть пустым")
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId
     @JoinColumn(name = "advertisement_id",
@@ -48,30 +43,25 @@ public class Product {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Advertisement advertisement;
 
-    @NotNull(message = "Категория не должна быть пустой")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id",
             foreignKey = @ForeignKey(name = "fk_prod_cat_id_cat_id"),
             nullable = false)
     private Category category;
 
-    @NotNull(message = "Цена не должна быть пустой")
-    @Min(value = 0, message = "Цена должна быть больше или равна 0")
     @Column(name = "price", nullable = false)
     private BigDecimal price;
 
     @Column(name = "description", length = 2048)
     private String description;
 
-    @Valid
     @Type(type = "jsonb")
     @Column(name = "properties", columnDefinition = "jsonb")
     private ProductProperties properties;
 
-    @Size(max = 10, message = "Количество изображений не должно превышать 10")
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
-    @OneToMany(mappedBy = "product", cascade = { PERSIST, MERGE })
+    @OneToMany(mappedBy = "product", cascade = { PERSIST, MERGE, REMOVE }, orphanRemoval = true)
     private List<Attachment> attachments = new ArrayList<>();
 
     public Product(Category category, BigDecimal price) {
@@ -96,12 +86,30 @@ public class Product {
         }
     }
 
-    public void addAttachments(Collection<Attachment> attachments) {
-        attachments.forEach(this::addAttachment);
+    public Attachment removeById(Long id) {
+        for (Attachment attachment : attachments) {
+            if(attachment.getId().equals(id)) {
+                removeAttachment(attachment);
+                return attachment;
+            }
+        }
+        return null;
     }
 
-    public void removeAll(Collection<Attachment> attachments) {
-        attachments.forEach(this::removeAttachment);
+    public List<Attachment> getAttachments() {
+        return Collections.unmodifiableList(attachments);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Product other)) return false;
+        return id != null && id.equals(other.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
     }
 
 }

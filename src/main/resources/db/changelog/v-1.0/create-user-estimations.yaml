@@ -1,0 +1,66 @@
+databaseChangeLog:
+
+  - changeSet:
+      id: user_estimations
+      author: stoker
+      changes:
+        - createTable:
+            tableName: user_estimations
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: user_estimationsPK
+                  name: user_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: user_estimationsPK
+                  name: owner_user_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: value
+                  type: INTEGER
+              - column:
+                  name: comment
+                  type: VARCHAR(1024)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: estimated_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+
+  - changeSet:
+      id: fk_user_ested_user_user_id
+      author: stoker
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: user_estimations
+            constraintName: fk_user_ested_user_user_id
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: users
+            validate: true
+            onDelete: CASCADE
+
+  - changeSet:
+      id: fk_user_esting_by_user_id
+      author: stoker
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: owner_user_id
+            baseTableName: user_estimations
+            constraintName: fk_user_esting_by_user_id
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: users
+            validate: true
+            onDelete: CASCADE

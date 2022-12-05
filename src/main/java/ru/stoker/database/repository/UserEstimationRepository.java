@@ -9,6 +9,6 @@ import java.util.List;
 public interface UserEstimationRepository
         extends JpaRepository<UserEstimation, UserEstimationId> {
 
-    List<UserEstimation> findAllByUserEstimationIdEstimatedUserId(Long id);
+    List<UserEstimation> findByIdUserId(Long id);
 
 }

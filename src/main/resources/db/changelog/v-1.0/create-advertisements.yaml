@@ -1,0 +1,54 @@
+databaseChangeLog:
+
+  - changeSet:
+      id: advertisement-seq
+      author: stoker
+      changes:
+        - createSequence:
+            incrementBy: 1
+            sequenceName: ads_seq
+
+  - changeSet:
+      id: advertisements
+      author: stoker
+      changes:
+        - createTable:
+            tableName: advertisements
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: advertisementsPK
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: user_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: name
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: posted_at
+                  type: date
+
+  - changeSet:
+      id: fk_ads_user_id
+      author: stoker
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: advertisements
+            constraintName: fk_ads_user_id
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: users
+            validate: true
+            onDelete: CASCADE

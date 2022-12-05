@@ -1,47 +1,31 @@
 package ru.stoker.database.entity;
 
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 import ru.stoker.database.entity.embeddable.Estimation;
 import ru.stoker.database.entity.embeddable.UserEstimationId;
 
-import javax.persistence.*;
-import javax.validation.Valid;
+import javax.persistence.Embedded;
+import javax.persistence.EmbeddedId;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
+@Getter
+@Setter
 @Entity
 @Table(name = "user_estimations")
 public class UserEstimation {
 
-    @Getter
-    @Valid
     @EmbeddedId
-    private UserEstimationId userEstimationId;
+    private UserEstimationId id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "estimating_user_id", updatable = false, insertable = false,
-            foreignKey = @ForeignKey(name = "fk_user_esting_by_user_id"))
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private User estimatingUser;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "estimated_user_id", updatable = false, insertable = false,
-            foreignKey = @ForeignKey(name = "fk_user_ested_user_user_id"))
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private User estimatedUser;
-
-    @Getter
-    @Setter
-    @Valid
     @Embedded
     private Estimation estimation;
 
-    public UserEstimation(Long estimatingUserId, Long estimatedUserId, Estimation estimation) {
-        userEstimationId = new UserEstimationId(estimatingUserId, estimatedUserId);
+    public UserEstimation(UserEstimationId id, Estimation estimation) {
+        this.id = id;
         this.estimation = estimation;
     }
 
