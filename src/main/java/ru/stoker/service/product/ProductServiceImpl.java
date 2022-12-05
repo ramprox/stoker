@@ -10,7 +10,9 @@ import ru.stoker.database.repository.CategoryRepository;
 import ru.stoker.exceptions.Advt;
 import ru.stoker.exceptions.Advt.UpdateOperationException;
 import ru.stoker.exceptions.AttachmentEx;
+import ru.stoker.exceptions.AttachmentStorage;
 import ru.stoker.exceptions.AttachmentStorage.FileOperationException;
+import ru.stoker.exceptions.AttachmentStorage.UnknownImageTypeException;
 import ru.stoker.exceptions.Category;
 import ru.stoker.service.attachmentstorage.AttachmentStorageService;
 
@@ -41,7 +43,11 @@ public class ProductServiceImpl implements ProductService {
             storageService.createBucket(product.getId());
             addAttachments(product, files);
         } catch (FileOperationException ex) {
+            storageService.deleteBucket(product.getId());
             throw new Advt.SaveOperationException();
+        } catch (UnknownImageTypeException ex) {
+            storageService.deleteBucket(product.getId());
+            throw ex;
         }
     }
 
