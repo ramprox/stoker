@@ -39,7 +39,6 @@ public class ConfirmationServiceImpl implements ConfirmationService {
     public String startConfirmFlow(User user) {
         String code = UUID.randomUUID().toString();
         String link = String.format(confirmProperties.getLinkTemplate(), user.getId(), code);
-//        return link;
         return notificationService.notify(user.getPersonalData().getContacts(), link);
     }
 
