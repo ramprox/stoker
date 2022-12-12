@@ -4,6 +4,7 @@ import ru.stoker.database.entity.User;
 import ru.stoker.database.entity.enums.Role;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import static ru.stoker.util.builder.CredentialsBuilder.credentials;
 import static ru.stoker.util.builder.PersonalDataBuilder.personalData;
@@ -19,6 +20,8 @@ public class UserBuilder implements EntityBuilder<User> {
     private Role role = Role.USER;
 
     private boolean confirmed = true;
+
+    private String confirmCode = UUID.randomUUID().toString();
 
     private LocalDateTime createdAt = LocalDateTime.now();
 
@@ -73,6 +76,12 @@ public class UserBuilder implements EntityBuilder<User> {
         return builder;
     }
 
+    public UserBuilder withConfirmCode(String code) {
+        UserBuilder builder = new UserBuilder(this);
+        builder.confirmCode = code;
+        return builder;
+    }
+
     @Override
     public User build() {
         User user = new User();
@@ -82,6 +91,8 @@ public class UserBuilder implements EntityBuilder<User> {
         user.setRole(role);
         user.setConfirmed(confirmed);
         user.setCreatedAt(createdAt);
+        user.setConfirmCode(confirmCode);
         return user;
     }
+
 }

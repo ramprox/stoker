@@ -72,6 +72,9 @@ databaseChangeLog:
                     nullable: false
                   name: created_at
                   type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: confirm_code
+                  type: VARCHAR(255)
 
   - changeSet:
       id: login-unique-index

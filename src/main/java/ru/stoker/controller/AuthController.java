@@ -21,10 +21,12 @@ import java.util.Locale;
 import static org.springframework.http.HttpStatus.*;
 import static ru.stoker.exceptions.Auth.IncorrectPasswordException.PASSWORD_INCORRECT;
 import static ru.stoker.exceptions.Auth.LoginNotFoundException.LOGIN_NOT_FOUND;
+import static ru.stoker.exceptions.ConfirmationEx.ConfirmCodeIncorrectException.CONFIRM_CODE_INCORRECT;
 import static ru.stoker.exceptions.ConfirmationEx.ConfirmTimeExpiredException.CONFIRM_TIME_EXPIRED;
 import static ru.stoker.exceptions.ConfirmationEx.UserAlreadyConfirmedException.USER_ALREADY_CONFIRMED;
 import static ru.stoker.exceptions.ConfirmationEx.UserNotConfirmedException.USER_NOT_CONFIRMED;
 import static ru.stoker.exceptions.NotifySendException.CONFIRM_EXCEPTION_MESSAGE;
+import static ru.stoker.exceptions.UserEx.NotFoundException.USER_NOT_FOUND;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -103,6 +105,18 @@ public class AuthController {
     @ExceptionHandler(NotifySendException.class)
     public String handleNotifySendException(Locale locale) {
         return messageSource.getMessage(CONFIRM_EXCEPTION_MESSAGE, null, locale);
+    }
+
+    @ResponseStatus(NOT_FOUND)
+    @ExceptionHandler(UserEx.NotFoundException.class)
+    public String handleUserNotFoundException(UserEx.NotFoundException ex, Locale locale) {
+        return messageSource.getMessage(USER_NOT_FOUND, new Object[]{ ex.getId() }, locale);
+    }
+
+    @ResponseStatus(BAD_REQUEST)
+    @ExceptionHandler(ConfirmationEx.ConfirmCodeIncorrectException.class)
+    public String handleConfirmCodeIncorrectException(Locale locale) {
+        return messageSource.getMessage(CONFIRM_CODE_INCORRECT, null, locale);
     }
 
 }

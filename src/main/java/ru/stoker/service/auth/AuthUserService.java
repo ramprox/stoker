@@ -6,7 +6,7 @@ import ru.stoker.dto.profile.CredentialsDto;
 
 public interface AuthUserService {
 
-    User register(RegisterDto userDto);
+    User register(RegisterDto registerDto);
 
     void checkCredentialsAndConfirmed(CredentialsDto credentialsDto);
 

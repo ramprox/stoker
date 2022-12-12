@@ -38,6 +38,7 @@ public class ConfirmationServiceImpl implements ConfirmationService {
     @Override
     public String startConfirmFlow(User user) {
         String code = UUID.randomUUID().toString();
+        user.setConfirmCode(code);
         String link = String.format(confirmProperties.getLinkTemplate(), user.getId(), code);
         return notificationService.notify(user.getPersonalData().getContacts(), link);
     }
@@ -50,7 +51,9 @@ public class ConfirmationServiceImpl implements ConfirmationService {
         if (user.isConfirmed()) {
             throw new ConfirmationEx.UserAlreadyConfirmedException();
         }
-        log.info("Пользователь с id = {} подтвердил регистрацию", userId);
+        if(!user.getConfirmCode().equals(code)) {
+            throw new ConfirmationEx.ConfirmCodeIncorrectException();
+        }
         user.setConfirmed(true);
     }
 
@@ -59,15 +62,22 @@ public class ConfirmationServiceImpl implements ConfirmationService {
     public void confirmExpiredTask() {
         log.info("Запустилась задача на проверку подтверждения регистрации");
         List<User> notConfirmedUsers = userRepository.findByConfirmedIsFalse();
-        notConfirmedUsers.forEach(user -> {
-            LocalDateTime createdAt = user.getCreatedAt();
-            Duration duration = Duration.between(createdAt, LocalDateTime.now());
-            if(duration.compareTo(confirmProperties.getWaitDuration()) > 0) {
-                userRepository.deleteById(user.getId());
-                log.info("Время ожидания регистрации пользователя с id = {} истекло. Пользователь удален.", user.getId());
-            }
-        });
+        notConfirmedUsers.stream()
+                .filter(this::isConfirmTimeExpired)
+                .forEach(this::deleteUser);
         log.info("Задача проверки подтверждения регистрации закончена");
+    }
+
+    private boolean isConfirmTimeExpired(User user) {
+        LocalDateTime createdAt = user.getCreatedAt();
+        Duration duration = Duration.between(createdAt, LocalDateTime.now());
+        return duration.compareTo(confirmProperties.getWaitDuration()) > 0;
+    }
+
+    private void deleteUser(User user) {
+        Long userId = user.getId();
+        userRepository.deleteById(userId);
+        log.info("Время ожидания регистрации пользователя с id = {} истекло. Пользователь удален.", user.getId());
     }
 
 }

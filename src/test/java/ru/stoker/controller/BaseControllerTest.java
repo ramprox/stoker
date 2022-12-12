@@ -32,7 +32,9 @@ import ru.stoker.dto.product.productproperties.notebook.ProcessorDto;
 import ru.stoker.dto.productestimaton.ProductEstimationDto;
 import ru.stoker.dto.profile.AdminUserProfileInfo;
 import ru.stoker.dto.userestimation.UserEstimationDto;
+import ru.stoker.util.builder.CredentialsBuilder;
 import ru.stoker.util.builder.DatabaseFacade;
+import ru.stoker.util.builder.PersonalDataBuilder;
 import ru.stoker.util.factory.AdminProfileFactory;
 
 import java.io.IOException;
@@ -50,6 +52,7 @@ import static org.springframework.http.MediaType.MULTIPART_FORM_DATA;
 import static org.springframework.http.RequestEntity.post;
 import static ru.stoker.util.builder.CredentialsBuilder.credentials;
 import static ru.stoker.util.builder.PersonalDataBuilder.personalData;
+import static ru.stoker.util.builder.UserBuilder.user;
 import static ru.stoker.util.factory.ByteArrayResourceFactory.createByteArrayResource;
 import static ru.stoker.util.factory.CategoryDtoFactory.categoryDto;
 import static ru.stoker.util.factory.AdvtDtosFactory.getCreateAdvt;
@@ -125,18 +128,17 @@ public class BaseControllerTest {
     }
 
     private User saveAdmin() {
-        Credentials credentials = credentials()
+        CredentialsBuilder credentials = credentials()
                 .withLogin("admin")
-                .withPassword(passwordEncoder.encode("admin"))
-                .build();
-        PersonalData personalData = personalData()
+                .withPassword(passwordEncoder.encode("admin"));
+        PersonalDataBuilder personalData = personalData()
                 .withPhone("87777777777")
-                .withEmail("admin@mail.ru")
+                .withEmail("admin@mail.ru");
+        User admin = user()
+                .withCredentials(credentials)
+                .withPersonalData(personalData)
+                .withRole(Role.ADMIN)
                 .build();
-        User admin = new User(credentials, personalData);
-        admin.setConfirmed(true);
-        admin.setRole(Role.ADMIN);
-        admin.setCreatedAt(LocalDateTime.now());
         databaseFacade.executeInTransaction(() -> userRepository.save(admin));
         return admin;
     }

@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import ru.stoker.database.entity.enums.Role;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Data
@@ -14,5 +15,8 @@ public class AdminUserProfileInfo extends UserProfileInfo {
     private Role role;
 
     private boolean confirmed;
+
+    @NotBlank(message = "{confirm.code.not.blank}")
+    private String confirmCode;
 
 }

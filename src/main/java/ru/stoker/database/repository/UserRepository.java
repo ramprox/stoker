@@ -14,4 +14,6 @@ public interface UserRepository extends JpaRepository<User, Long>,
 
     List<User> findByConfirmedIsFalse();
 
+    Optional<User> findByConfirmCode(String confirmCode);
+
 }

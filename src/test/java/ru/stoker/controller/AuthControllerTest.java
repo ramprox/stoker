@@ -2,7 +2,8 @@ package ru.stoker.controller;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.ResponseEntity;
 import ru.stoker.dto.auth.LoginSuccessDto;
@@ -15,6 +16,7 @@ import ru.stoker.exceptions.NotifySendException;
 import ru.stoker.service.notification.NotificationService;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpStatus.OK;
 import static ru.stoker.util.builder.CredentialsBuilder.credentials;
@@ -25,6 +27,9 @@ public class AuthControllerTest extends BaseControllerTest {
 
     @MockBean
     private NotificationService notificationService;
+
+    @Captor
+    ArgumentCaptor<String> linkCapture;
 
     @DisplayName("Регистрация пользователя")
     @Test
@@ -38,7 +43,7 @@ public class AuthControllerTest extends BaseControllerTest {
                 Мы отправили на Вашу почту 'email@mail.ru' письмо.\\n\\
                   Пожалуйста, откройте его и пройдите по ссылке с кодом для подтверждения регистрации.
                 """;
-        when(notificationService.notify(Mockito.any(), Mockito.any()))
+        when(notificationService.notify(any(), linkCapture.capture()))
                 .thenReturn(expectedMessage);
 
         ResponseEntity<RegisterSuccessDto> response = register(registerDto, RegisterSuccessDto.class);
@@ -47,6 +52,16 @@ public class AuthControllerTest extends BaseControllerTest {
         RegisterSuccessDto actualBody = response.getBody();
         RegisterSuccessDto expectedBody = new RegisterSuccessDto(expectedMessage);
         assertThat(actualBody).isEqualTo(expectedBody);
+
+        String link = linkCapture.getValue();
+        link = link.substring("http://localhost:8080".length());
+
+        ResponseEntity<String> confirmResponse = confirm(link, String.class);
+
+        assertThat(confirmResponse.getStatusCode()).isEqualTo(OK);
+        String expectedSuccessConfirmMsg = "Вы успешно подтвердили регистрацию. Пожайлуста, авторизуйтесь.";
+        String actualSuccessConfirmMsg = confirmResponse.getBody();
+        assertThat(actualSuccessConfirmMsg).isEqualTo(expectedSuccessConfirmMsg);
     }
 
     @DisplayName("Аутентификация пользователя")
@@ -71,6 +86,10 @@ public class AuthControllerTest extends BaseControllerTest {
 
     private <T> ResponseEntity<T> login(CredentialsDto credentialsDto, Class<T> type) {
         return restTemplate.postForEntity("/api/v1/auth/login", credentialsDto, type);
+    }
+
+    private <T> ResponseEntity<T> confirm(String link, Class<T> type) {
+        return restTemplate.getForEntity(link, type);
     }
 
 }

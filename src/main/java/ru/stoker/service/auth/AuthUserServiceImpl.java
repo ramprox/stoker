@@ -36,11 +36,11 @@ public class AuthUserServiceImpl implements AuthUserService {
     }
 
     @Override
-    public User register(RegisterDto userDto) {
-        String login = userDto.getCredentials().getLogin();
-        ContactsDto contactsDto = userDto.getPersonalData().getContacts();
+    public User register(RegisterDto registerDto) {
+        String login = registerDto.getCredentials().getLogin();
+        ContactsDto contactsDto = registerDto.getPersonalData().getContacts();
         userChecker.checkNotExistUser(login, contactsDto);
-        User user = profileMapper.fromRegisterDto(userDto);
+        User user = profileMapper.fromRegisterDto(registerDto);
         return userRepository.save(user);
     }
 

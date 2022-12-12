@@ -49,6 +49,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void confirm(Long userId, String code) {
         confirmationService.confirm(userId, code);
+        log.info("Пользователь с id = {} подтвердил регистрацию", userId);
     }
 
 }

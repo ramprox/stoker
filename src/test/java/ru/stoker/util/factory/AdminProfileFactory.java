@@ -6,6 +6,7 @@ import ru.stoker.dto.profile.CredentialsDto;
 import ru.stoker.dto.profile.PersonalDataDto;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -22,6 +23,7 @@ public class AdminProfileFactory {
         profileInfo.setPersonalData(personalDataDto);
         profileInfo.setRole(Role.USER);
         profileInfo.setConfirmed(true);
+        profileInfo.setConfirmCode(UUID.randomUUID().toString());
         return profileInfo;
     }
 
@@ -43,6 +45,7 @@ public class AdminProfileFactory {
         profileInfo.setPersonalData(personalDataDto);
         profileInfo.setRole(Role.USER);
         profileInfo.setConfirmed(true);
+        profileInfo.setConfirmCode(UUID.randomUUID().toString());
         return profileInfo;
     }
 

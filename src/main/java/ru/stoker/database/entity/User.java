@@ -43,6 +43,9 @@ public class User {
     @Column(name = "is_confirmed", nullable = false)
     private boolean confirmed;
 
+    @Column(name = "confirm_code")
+    private String confirmCode;
+
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 

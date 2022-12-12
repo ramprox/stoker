@@ -12,4 +12,9 @@ public class ConfirmationEx {
     public static class UserNotConfirmedException extends RuntimeException {
         public static final String USER_NOT_CONFIRMED = "user.not.confirmed";
     }
+
+    public static class ConfirmCodeIncorrectException extends RuntimeException {
+        public static final String CONFIRM_CODE_INCORRECT = "confirm.code.incorrect";
+    }
+
 }
