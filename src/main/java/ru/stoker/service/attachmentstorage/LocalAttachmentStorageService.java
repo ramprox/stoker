@@ -8,7 +8,10 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.stoker.exceptions.AttachmentStorage.FileOperationException;
 
 import javax.annotation.PostConstruct;
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -52,10 +55,10 @@ public class LocalAttachmentStorageService implements AttachmentStorageService {
     }
 
     @Override
-    public byte[] getByProductIdAndUri(Long productId, String uri) {
-        Path path = getPathByProductId(productId).resolve(uri);
+    public InputStream getByProductIdAndFilename(Long productId, String filename) {
+        Path path = getPathByProductId(productId).resolve(filename);
         try {
-            return Files.readAllBytes(path);
+            return new BufferedInputStream(Files.newInputStream(path));
         } catch (IOException ex) {
             String message = String.format("Не могу прочитать содержимое файла '%s'", path);
             log.error(message);

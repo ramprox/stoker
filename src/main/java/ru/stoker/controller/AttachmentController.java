@@ -1,6 +1,7 @@
 package ru.stoker.controller;
 
 import org.springframework.context.MessageSource;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +31,7 @@ public class AttachmentController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<byte[]> getById(@PathVariable Long id) {
+    public ResponseEntity<InputStreamResource> getById(@PathVariable Long id) {
         AttachmentDto attachDto = attachmentService.getById(id);
         HttpHeaders headers = new HttpHeaders();
         headers.add(CONTENT_TYPE, attachDto.getContentType());
