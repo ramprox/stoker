@@ -10,6 +10,7 @@ import ru.stoker.dto.productestimaton.ProductEstimationInfo;
 import ru.stoker.exceptions.ProductEstimationEx.AlreadyExistException;
 import ru.stoker.exceptions.ProductEstimationEx.NotFoundException;
 import ru.stoker.exceptions.ProductEstimationEx.UserSelfEstimationException;
+import ru.stoker.exceptions.ProductEx;
 import ru.stoker.service.security.StokerUserDetails;
 import ru.stoker.service.productestimation.ProductEstimationService;
 
@@ -87,6 +88,13 @@ public class ProductEstimationController {
     public String handleNotFoundException(NotFoundException ex, Locale locale) {
         return messageSource.getMessage(PRODUCT_ESTIMATION_NOT_FOUND,
                 new Object[]{ ex.getUserId(), ex.getProductId() }, locale);
+    }
+
+    @ResponseStatus(NOT_FOUND)
+    @ExceptionHandler(ProductEx.NotFoundException.class)
+    public String handleProductNotFoundException(ProductEx.NotFoundException ex, Locale locale) {
+        return messageSource.getMessage(ProductEx.NotFoundException.PRODUCT_NOT_FOUND,
+                new Object[]{ ex.getId() }, locale);
     }
 
 }
