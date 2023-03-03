@@ -1,6 +1,6 @@
 package ru.stoker.service.attachmentstorage;
 
-import org.springframework.web.multipart.MultipartFile;
+import org.apache.tomcat.util.http.fileupload.FileItemIterator;
 
 import java.io.InputStream;
 
@@ -10,7 +10,7 @@ public interface AttachmentStorageService {
 
     void deleteBucket(Long productId);
 
-    void saveFile(Long productId, String filename, MultipartFile file);
+    void saveFile(Long productId, String filename, FileItemIterator fileItemIterator);
 
     void deleteFile(Long productId, String filename);
 

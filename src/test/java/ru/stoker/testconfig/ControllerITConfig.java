@@ -2,8 +2,10 @@ package ru.stoker.testconfig;
 
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.util.FileSystemUtils;
 import ru.stoker.service.attachmentstorage.AttachmentStorageService;
 import ru.stoker.service.attachmentstorage.LocalAttachmentStorageService;

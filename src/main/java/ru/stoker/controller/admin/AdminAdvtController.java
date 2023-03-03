@@ -1,10 +1,17 @@
 package ru.stoker.controller.admin;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import ru.stoker.dto.advt.AdminCreateAdvt;
 import ru.stoker.dto.advt.AdminUpdateAdvt;
 import ru.stoker.dto.advt.AdvtInfo;
@@ -15,11 +22,11 @@ import ru.stoker.exceptions.UserEx;
 import ru.stoker.service.advertisement.AdminAdvtService;
 
 import javax.validation.Valid;
-import java.util.List;
 import java.util.Locale;
 
-import static org.springframework.http.HttpStatus.*;
-import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE;
 import static ru.stoker.exceptions.Advt.DeleteOperationException.DELETE_OPERATION_FAILED;
 import static ru.stoker.exceptions.Advt.NotFoundException.ADVT_NOT_FOUND;
 import static ru.stoker.exceptions.Advt.SaveOperationException.SAVE_OPERATION_FAILED;
@@ -31,29 +38,21 @@ import static ru.stoker.exceptions.UserEx.NotFoundException.USER_NOT_FOUND;
 @PreAuthorize("hasAuthority('ADMIN')")
 @RestController
 @RequestMapping("/api/v1/admin/advertisement")
+@RequiredArgsConstructor
 public class AdminAdvtController {
 
     private final AdminAdvtService advertisementService;
 
     private final MessageSource messageSource;
 
-    @Autowired
-    public AdminAdvtController(AdminAdvtService advertisementService,
-                               MessageSource messageSource) {
-        this.advertisementService = advertisementService;
-        this.messageSource = messageSource;
-    }
-
     @PostMapping
-    public AdvtInfo create(@RequestPart("advertisement") @Valid AdminCreateAdvt advt,
-                           @RequestPart(required = false) List<MultipartFile> files) {
-        return advertisementService.create(advt, files);
+    public AdvtInfo create(@RequestBody @Valid AdminCreateAdvt advt) {
+        return advertisementService.create(advt);
     }
 
-    @PutMapping(consumes = MULTIPART_FORM_DATA_VALUE)
-    public AdvtInfo update(@RequestPart("advertisement") @Valid AdminUpdateAdvt advt,
-                           @RequestPart(required = false) List<MultipartFile> files) {
-        return advertisementService.update(advt, files);
+    @PutMapping
+    public AdvtInfo update(@RequestBody @Valid AdminUpdateAdvt advt) {
+        return advertisementService.update(advt);
     }
 
     @DeleteMapping("/{id}")

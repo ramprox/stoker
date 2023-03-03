@@ -1,17 +1,18 @@
 package ru.stoker.service.attachmentstorage;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.util.http.fileupload.FileItemIterator;
+import org.apache.tomcat.util.http.fileupload.FileItemStream;
+import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileSystemUtils;
-import org.springframework.web.multipart.MultipartFile;
 import ru.stoker.exceptions.AttachmentStorage.FileOperationException;
 
 import javax.annotation.PostConstruct;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -67,10 +68,10 @@ public class LocalAttachmentStorageService implements AttachmentStorageService {
     }
 
     @Override
-    public void saveFile(Long productId, String filename, MultipartFile file) {
+    public void saveFile(Long productId, String filename, FileItemIterator fileItemIterator) {
         Path path = getPathByProductId(productId);
         Path localFilePath = path.resolve(filename);
-        writeFile(localFilePath, file);
+        writeFile(localFilePath, fileItemIterator);
     }
 
     @Override
@@ -104,9 +105,18 @@ public class LocalAttachmentStorageService implements AttachmentStorageService {
         return storagePath.resolve(productId.toString());
     }
 
-    private void writeFile(Path path, MultipartFile file) {
+    private void writeFile(Path path, FileItemIterator fileItemIterator) {
         try {
-            Files.write(path, file.getBytes());
+            while (fileItemIterator.hasNext()) {
+                FileItemStream item = fileItemIterator.next();
+                if(!item.isFormField()) {
+                    var in = item.openStream();
+                    var out = Files.newOutputStream(path);
+                    IOUtils.copy(in, out);
+                    IOUtils.closeQuietly(in);
+                    IOUtils.closeQuietly(out);
+                }
+            }
             log.info("Записано содержимое картинки по пути: {}", path);
         } catch (IOException ex) {
             String message = String.format("Не могу записать в файл '%s'", path);
