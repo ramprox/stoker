@@ -11,18 +11,19 @@ services:
     volumes:
       - stoker_db:/var/lib/postgresql/data
 
-#  backend:
-#    image: backend:1.0
-#    environment:
-#      DB: db
-#    ports:
-#      - "8080:8080"
-#    depends_on:
-#      - db
-#    volumes:
-#      - backend-data:/app/pictures
-#
+  backend:
+    image: backend:1.0
+    environment:
+      DB: db
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    volumes:
+      - stoker_pictures:/app/pictures
+
 volumes:
   stoker_db:
     external: true
-#  backend-data:
+  stoker_pictures:
+    external: true
