@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://${DB:localhost}:5432/stoker_db
+    url: jdbc:postgresql://${DB:localhost}:1111/stoker_db
     driver-class-name: org.postgresql.Driver
     username: stoker
     password: stoker
@@ -31,6 +31,9 @@ spring:
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
+  servlet:
+    multipart:
+      enabled: false
 
 mail:
   sender: Stoker <ramil19882307@gmail.com>

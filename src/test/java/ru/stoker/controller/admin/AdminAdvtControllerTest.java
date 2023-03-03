@@ -2,13 +2,8 @@ package ru.stoker.controller.admin;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import ru.stoker.controller.BaseControllerTest;
 import ru.stoker.dto.advt.AdminCreateAdvt;
 import ru.stoker.dto.advt.AdminUpdateAdvt;
@@ -25,14 +20,16 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
-import static org.springframework.http.MediaType.IMAGE_JPEG_VALUE;
-import static org.springframework.http.MediaType.MULTIPART_FORM_DATA;
-import static org.springframework.http.RequestEntity.*;
-import static ru.stoker.util.factory.AdvtDtosFactory.*;
-import static ru.stoker.util.factory.ByteArrayResourceFactory.createByteArrayResource;
+import static org.springframework.http.RequestEntity.delete;
+import static org.springframework.http.RequestEntity.get;
+import static org.springframework.http.RequestEntity.post;
+import static org.springframework.http.RequestEntity.put;
+import static ru.stoker.util.factory.AdvtDtosFactory.createAdminUpdateAdvt;
+import static ru.stoker.util.factory.AdvtDtosFactory.createUpdateProduct;
+import static ru.stoker.util.factory.AdvtDtosFactory.fromAdminCreateAdvt;
+import static ru.stoker.util.factory.AdvtDtosFactory.getCreateProduct;
 import static ru.stoker.util.factory.CategoryDtoFactory.categoryDto;
 
 @DisplayName("Интеграционные тесты AdminAdvtController")
@@ -51,7 +48,7 @@ public class AdminAdvtControllerTest extends BaseControllerTest {
         advt.setUserId(user.getId());
         advt.setProduct(product);
 
-        ResponseEntity<AdvtInfo> response = createAdvt(advt, List.of(), AdvtInfo.class);
+        ResponseEntity<AdvtInfo> response = createAdvt(advt, AdvtInfo.class);
         assertThat(response.getStatusCode()).isEqualTo(OK);
         AdvtInfo actualAdvt = response.getBody();
         AdvtInfo expectedAdvt = fromAdminCreateAdvt(1L, advt, List.of(), LocalDate.now());
@@ -64,21 +61,17 @@ public class AdminAdvtControllerTest extends BaseControllerTest {
     public void updateTest() {
         AdminUserProfileInfo user = saveDefaultUserAndGet();
         AdvtInfo expectedAdvt = saveDefaultAdvtAndGet(user.getCredentials().getLogin());
-        List<Long> removingAttachments = List.of(1L, 2L);
+        List<Long> removingAttachments = List.of();
         UpdateProduct updateProduct = createUpdateProduct(expectedAdvt.getProduct(), removingAttachments);
         AdminUpdateAdvt updateAdvt = createAdminUpdateAdvt(user.getId(), expectedAdvt.getId(), "newName", updateProduct);
         expectedAdvt.setName(updateAdvt.getName());
         expectedAdvt.getProduct().getAttachments().removeAll(removingAttachments);
 
-        ResponseEntity<AdvtInfo> response = updateAdvt(updateAdvt, List.of(), AdvtInfo.class);
+        ResponseEntity<AdvtInfo> response = updateAdvt(updateAdvt, AdvtInfo.class);
 
         assertThat(response.getStatusCode()).isEqualTo(OK);
         AdvtInfo actualAdvt = response.getBody();
         assertThat(actualAdvt).isEqualTo(expectedAdvt);
-        for (Long attId : removingAttachments) {
-            ResponseEntity<String> attachment = getAttachment(attId, String.class);
-            assertThat(attachment.getStatusCode()).isEqualTo(NOT_FOUND);
-        }
     }
 
     @DisplayName("Удаление по id")
@@ -97,37 +90,17 @@ public class AdminAdvtControllerTest extends BaseControllerTest {
         return restTemplate.getForEntity("/api/v1/advertisement/{id}", type, id);
     }
 
-    private <T> ResponseEntity<T> createAdvt(AdminCreateAdvt advt, List<byte[]> files, Class<T> type) {
-        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-        files.forEach(file -> {
-            ByteArrayResource resource = createByteArrayResource(file);
-            HttpHeaders fileHeaders = new HttpHeaders();
-            fileHeaders.add(CONTENT_TYPE, IMAGE_JPEG_VALUE);
-            HttpEntity<ByteArrayResource> entity = new HttpEntity<>(resource, fileHeaders);
-            body.add("files", entity);
-        });
-        body.add("advertisement", advt);
-        RequestEntity<MultiValueMap<String, Object>> request = post("/api/v1/admin/advertisement")
+    private <T> ResponseEntity<T> createAdvt(AdminCreateAdvt advt, Class<T> type) {
+        RequestEntity<AdminCreateAdvt> request = post("/api/v1/admin/advertisement")
                 .header(AUTHORIZATION, adminAuthHeader())
-                .contentType(MULTIPART_FORM_DATA)
-                .body(body);
+                .body(advt);
         return restTemplate.exchange(request, type);
     }
 
-    private <T> ResponseEntity<T> updateAdvt(AdminUpdateAdvt advtDto, List<byte[]> files, Class<T> type) {
-        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-        files.forEach(file -> {
-            ByteArrayResource resource = createByteArrayResource(file);
-            HttpHeaders fileHeaders = new HttpHeaders();
-            fileHeaders.add(CONTENT_TYPE, IMAGE_JPEG_VALUE);
-            HttpEntity<ByteArrayResource> entity = new HttpEntity<>(resource, fileHeaders);
-            body.add("files", entity);
-        });
-        body.add("advertisement", advtDto);
-        RequestEntity<MultiValueMap<String, Object>> request = put("/api/v1/admin/advertisement")
+    private <T> ResponseEntity<T> updateAdvt(AdminUpdateAdvt advtDto, Class<T> type) {
+        RequestEntity<AdminUpdateAdvt> request = put("/api/v1/admin/advertisement")
                 .header(AUTHORIZATION, adminAuthHeader())
-                .contentType(MULTIPART_FORM_DATA)
-                .body(body);
+                .body(advtDto);
         return restTemplate.exchange(request, type);
     }
 

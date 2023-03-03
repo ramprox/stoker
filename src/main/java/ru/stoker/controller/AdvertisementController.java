@@ -1,11 +1,20 @@
 package ru.stoker.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import ru.stoker.dto.advt.AdvtInfo;
 import ru.stoker.dto.advt.CreateAdvt;
 import ru.stoker.dto.advt.UpdateAdvt;
@@ -14,15 +23,16 @@ import ru.stoker.exceptions.Advt.SaveOperationException;
 import ru.stoker.exceptions.AttachmentEx;
 import ru.stoker.exceptions.AttachmentStorage.UnknownImageTypeException;
 import ru.stoker.exceptions.Category;
-import ru.stoker.service.security.StokerUserDetails;
 import ru.stoker.service.advertisement.AdvertisementService;
+import ru.stoker.service.security.StokerUserDetails;
 
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Locale;
 
-import static org.springframework.http.HttpStatus.*;
-import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE;
 import static ru.stoker.exceptions.Advt.DeleteOperationException.DELETE_OPERATION_FAILED;
 import static ru.stoker.exceptions.Advt.NotFoundException.ADVT_NOT_FOUND;
 import static ru.stoker.exceptions.Advt.SaveOperationException.SAVE_OPERATION_FAILED;
@@ -33,25 +43,18 @@ import static ru.stoker.exceptions.Category.NotFoundException.CATEGORY_NOT_FOUND
 
 @RestController
 @RequestMapping("/api/v1/advertisement")
+@RequiredArgsConstructor
 public class AdvertisementController {
 
-    protected final AdvertisementService advertisementService;
+    private final AdvertisementService advertisementService;
 
     private final MessageSource messageSource;
 
-    @Autowired
-    public AdvertisementController(AdvertisementService advertisementService,
-                                   MessageSource messageSource) {
-        this.advertisementService = advertisementService;
-        this.messageSource = messageSource;
-    }
-
     @PreAuthorize("hasAuthority('USER')")
-    @PostMapping(consumes = MULTIPART_FORM_DATA_VALUE)
-    public AdvtInfo save(@RequestPart("advertisement") @Valid CreateAdvt advtDto,
-                         @RequestPart(required = false) List<MultipartFile> files,
+    @PostMapping
+    public AdvtInfo save(@RequestBody @Valid CreateAdvt advtDto,
                          @AuthenticationPrincipal StokerUserDetails userDetails) {
-        return advertisementService.save(userDetails.getId(), advtDto, files);
+        return advertisementService.save(userDetails.getId(), advtDto);
     }
 
     @GetMapping("/{id}")
@@ -60,11 +63,10 @@ public class AdvertisementController {
     }
 
     @PreAuthorize("hasAuthority('USER') && @securityService.isUserHasAdvt(#advtDto.id)")
-    @PutMapping(consumes = MULTIPART_FORM_DATA_VALUE)
-    public AdvtInfo update(@RequestPart("advertisement") @Valid UpdateAdvt advtDto,
-                          @RequestPart(required = false) List<MultipartFile> files,
+    @PutMapping
+    public AdvtInfo update(@RequestBody @Valid UpdateAdvt advtDto,
                           @AuthenticationPrincipal StokerUserDetails userDetails) {
-        return advertisementService.update(userDetails.getId(), advtDto, files);
+        return advertisementService.update(userDetails.getId(), advtDto);
     }
 
     @PreAuthorize("hasAuthority('USER') && @securityService.isUserHasAdvt(#id)")

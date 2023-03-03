@@ -6,7 +6,7 @@
   </div>
 </details>
 
-<details><summary><h2>Сборка и запуск приложения</h2></summary>
+<details open=""><summary><h2>Сборка и запуск приложения</h2></summary>
 
 ```
 mvn clean package
